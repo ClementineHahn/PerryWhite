@@ -1,2 +1,2 @@
 # PerryWhite
-Outil pour créer une PR à partir d'un document sur Google Docs 
+Outil pour créer une *pull request* à partir d'un document sur Google Docs 
