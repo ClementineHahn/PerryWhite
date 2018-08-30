@@ -5,6 +5,12 @@ function onOpen() {
 
 function createPR(){
   var body = DocumentApp.getActiveDocument().getBody();
-  var firstChild = body.getChild(0)
-  DocumentApp.getUi().alert("*Type du 1stchild* sa mère" + ": " + firstChild.getType() + " // *Contenu du 1st child* la pute: " + firstChild.asText().getText())
+  var Number = body.getNumChildren()
+
+  for(var Numero = 0 ; Numero < Number ; Numero+=1){
+    var child = body.getChild(Numero)
+    var ParagraphHeading = child.getHeading()
+    
+    DocumentApp.getUi().alert(child.getType() + " / " + ParagraphHeading + " : \"\ " + child.asText().getText() + " \"\ " )
+  }
 }
