@@ -16,7 +16,36 @@ function createPR(){
     if(paragraphHeading === DocumentApp.ParagraphHeading.TITLE){
       allText = allText + '\n' + '# ' + child.asText().getText()
     }
-    else{
+ 
+    if(paragraphHeading === DocumentApp.ParagraphHeading.SUBTITLE){
+      allText = allText + '\n' + '## ' + child.asText().getText()
+    } 
+    
+    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING1){
+      allText = allText + '\n' + '### ' + child.asText().getText()
+    }
+     
+    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING2){
+      allText = allText + '\n' + '#### ' + child.asText().getText()
+    }
+    
+    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING3){
+      allText = allText + '\n' + '##### ' + child.asText().getText()
+    }
+    
+    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING4){
+      allText = allText + '\n' + '###### ' + child.asText().getText()
+    }
+    
+    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING5){
+      allText = allText + '\n' + '###### ' + child.asText().getText()
+    }
+    
+    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING6){
+      allText = allText + '\n' + '###### ' + child.asText().getText()
+    }
+    
+    if(paragraphHeading === DocumentApp.ParagraphHeading.NORMAL){
       allText = allText + '\n' + child.asText().getText()
     }
     
