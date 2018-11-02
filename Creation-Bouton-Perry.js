@@ -11,13 +11,18 @@ function createPR(){
 
   for(var Numero = 0 ; Numero < Number ; Numero+=1){
     var child = body.getChild(Numero)
-    var ParagraphHeading = child.getHeading()
+    var paragraphHeading = child.getHeading()
     
-    allText = allText + '\n' + child.asText().getText()
+    if(paragraphHeading === DocumentApp.ParagraphHeading.TITLE){
+      allText = allText + '\n' + '# ' + child.asText().getText()
+    }
+    else{
+      allText = allText + '\n' + child.asText().getText()
+    }
     
     // DocumentApp.getUi().alert()
     //console.log(child.getType() + " / " + ParagraphHeading + " : \"\ " + child.asText().getText() + " \"\ " )
   } 
   
-  console.log(allText)
+  DocumentApp.getUi().alert(allText)
 }
