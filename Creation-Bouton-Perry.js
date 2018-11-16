@@ -3,8 +3,80 @@ function onOpen() {
 .addToUi();
 }
 
+
 function createPR(){
-  var body = DocumentApp.getActiveDocument().getBody();
+  var doc = DocumentApp.getActiveDocument()
+  
+  var markdown = GDocToMarkdown(doc)
+  
+  DocumentApp.getUi().alert(markdown)
+  
+  // sendMarkdownToGithub(repo, markdown, filename)
+}
+
+
+
+function gDocTextToMarkdown(gDocText){
+  var gDocTextMarkdown = '';
+  
+  var textString = gDocText.getText();
+      
+  var currentURLLink = undefined;
+  var currentLinkText = undefined;
+  
+  for(var i=0 ; i<textString.length ; i++){
+    var characterLink = gDocText.getLinkUrl(i);
+    
+    var currentCharacter = textString[i];
+    
+    if(!characterLink){ // no link
+      if(currentURLLink){ // end of previous link
+        var linkMarkdown = '['+currentLinkText+']('+currentURLLink+')'
+        gDocTextMarkdown += linkMarkdown;
+        
+        currentLinkText = undefined
+        currentURLLink = undefined
+      }
+      
+      gDocTextMarkdown += currentCharacter;
+    }
+    else{ // link
+      if(!currentURLLink){ // there was no link being tracked
+        currentLinkText = currentCharacter
+        currentURLLink = characterLink
+      }
+      else{ // previous link being tracked
+        if(characterLink === currentURLLink){ // same link
+          currentLinkText += currentCharacter
+        }
+        else{ // different link
+          // créer le lien en markdown
+          var linkMarkdown = '['+currentLinkText+']('+currentURLLink+')'
+          gDocTextMarkdown += linkMarkdown;
+          
+          // tracker le nouveau lien
+          currentLinkText = currentCharacter
+          currentURLLink = characterLink
+        }
+      } 
+    }
+  }
+  
+  if(currentLinkText && currentURLLink){
+    var linkMarkdown = '['+currentLinkText+']('+currentURLLink+')'
+    gDocTextMarkdown += linkMarkdown;
+  }
+
+  return gDocTextMarkdown;
+}
+
+
+/*
+  Function that transforms a Google Doc into a markdown string
+*/
+function GDocToMarkdown(gdoc){
+  var body = gdoc.getBody();
+  
   var Number = body.getNumChildren()
   
   var allText = '';
@@ -49,64 +121,11 @@ function createPR(){
     
     if(grandChildrenNumber >= 1){
       var textObject = child.getChild(0)
-      
-      var textString = textObject.getText();
-      
-      var currentURLLink = undefined;
-      var currentLinkText = undefined;
-      
-      for(var i=0 ; i<textString.length ; i++){
-        var characterLink = textObject.getLinkUrl(i);
-        
-        var currentCharacter = textString[i];
-        
-        if(!characterLink){ // no link
-          if(currentURLLink){ // end of previous link
-            var linkMarkdown = '['+currentLinkText+']('+currentURLLink+')'
-            paragraphTextMarkdown += linkMarkdown;
-            
-            currentLinkText = undefined
-            currentURLLink = undefined
-          }
-          
-          paragraphTextMarkdown += currentCharacter;
-        }
-        else{ // link
-          if(!currentURLLink){ // there was no link being tracked
-            currentLinkText = currentCharacter
-            currentURLLink = characterLink
-          }
-          else{ // previous link being tracked
-            if(characterLink === currentURLLink){ // same link
-              currentLinkText += currentCharacter
-            }
-            else{ // different link
-              // créer le lien en markdown
-              var linkMarkdown = '['+currentLinkText+']('+currentURLLink+')'
-              paragraphTextMarkdown += linkMarkdown;
-              
-              // tracker le nouveau lien
-              currentLinkText = currentCharacter
-              currentURLLink = characterLink
-            }
-          } 
-        }
-      }
-      
-      if(currentLinkText && currentURLLink){
-        var linkMarkdown = '['+currentLinkText+']('+currentURLLink+')'
-        paragraphTextMarkdown += linkMarkdown;
-      }
-      
+      paragraphTextMarkdown = gDocTextToMarkdown(textObject);  
     }
     
     allText += paragraphTextMarkdown;
-    
-    // DocumentApp.getUi().alert()
-    console.log(child.getType() + " / " + paragraphHeading + " : \"\ " + child.asText().getText() + " \"\ " )
   } 
   
-  DocumentApp.getUi().alert(allText)
+  return allText;
 }
-
-
