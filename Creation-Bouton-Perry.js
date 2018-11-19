@@ -3,11 +3,10 @@ function onOpen() {
 .addToUi();
 }
 
-
 function createPR(){
   var doc = DocumentApp.getActiveDocument()
   
-  var markdown = GDocToMarkdown(doc)
+  var markdown = DocumentToMarkdown(doc)
   
   DocumentApp.getUi().alert(markdown)
   
@@ -15,8 +14,79 @@ function createPR(){
 }
 
 
+function DocumentToMarkdown(gdoc){
+  var body = gdoc.getBody();
+  var Number = body.getNumChildren()
+  
+  var allMarkdown = '';
+  
+  for(var Numero = 0 ; Numero < Number ; Numero+=1){
+    var parChild = body.getChild(Numero)
+    allMarkdown += ParagraphToMarkdown(parChild)
+  }
+  
+  return allMarkdown;
+} 
 
-function gDocTextToMarkdown(gDocText){
+
+/*
+  Function that transforms a Paragraph object into a markdown string
+*/
+function ParagraphToMarkdown(aParagraph){
+  var paragraphMarkdown = '';
+  
+  var paragraphHeading = aParagraph.getHeading()
+
+  // Handle heading level
+  if(paragraphHeading === DocumentApp.ParagraphHeading.TITLE){
+    paragraphMarkdown = paragraphMarkdown + '\n' + '# '
+  }
+  if(paragraphHeading === DocumentApp.ParagraphHeading.SUBTITLE){
+    paragraphMarkdown = paragraphMarkdown + '\n' + '## '
+  } 
+  if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING1){
+    paragraphMarkdown = paragraphMarkdown + '\n' + '### '
+  }
+  if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING2){
+    paragraphMarkdown = paragraphMarkdown + '\n' + '#### '
+  }
+  if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING3){
+    paragraphMarkdown = paragraphMarkdown + '\n' + '##### '
+  }
+  if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING4){
+    paragraphMarkdown = paragraphMarkdown + '\n' + '###### '
+  }
+  if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING5){
+    paragraphMarkdown = paragraphMarkdown + '\n' + '###### '
+  }
+  if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING6){
+    paragraphMarkdown = paragraphMarkdown + '\n' + '###### '
+  }
+  if(paragraphHeading === DocumentApp.ParagraphHeading.NORMAL){
+    paragraphMarkdown = paragraphMarkdown + '\n';
+  }
+  
+  // transform inline text as markdown
+  var paragraphTextMarkdown = '';
+  
+  var grandChildrenNumber = aParagraph.getNumChildren();
+  
+  if(grandChildrenNumber >= 1){
+    // assume it's a Text child
+    var textObject = aParagraph.getChild(0)
+    paragraphTextMarkdown = TextToMarkdown(textObject);  
+  }
+  
+  paragraphMarkdown += paragraphTextMarkdown;
+  
+  return paragraphMarkdown;
+}
+
+
+/*
+  Function that transforms a Text object from a Google Doc into a markdown string
+*/
+function TextToMarkdown(gDocText){
   var gDocTextMarkdown = '';
   
   var textString = gDocText.getText();
@@ -70,62 +140,3 @@ function gDocTextToMarkdown(gDocText){
   return gDocTextMarkdown;
 }
 
-
-/*
-  Function that transforms a Google Doc into a markdown string
-*/
-function GDocToMarkdown(gdoc){
-  var body = gdoc.getBody();
-  
-  var Number = body.getNumChildren()
-  
-  var allText = '';
-
-  for(var Numero = 0 ; Numero < Number ; Numero+=1){
-    var child = body.getChild(Numero)
-    var paragraphHeading = child.getHeading()
-
-    // Handle heading level
-    if(paragraphHeading === DocumentApp.ParagraphHeading.TITLE){
-      allText = allText + '\n' + '# '
-    }
-    if(paragraphHeading === DocumentApp.ParagraphHeading.SUBTITLE){
-      allText = allText + '\n' + '## '
-    } 
-    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING1){
-      allText = allText + '\n' + '### '
-    }
-    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING2){
-      allText = allText + '\n' + '#### '
-    }
-    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING3){
-      allText = allText + '\n' + '##### '
-    }
-    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING4){
-      allText = allText + '\n' + '###### '
-    }
-    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING5){
-      allText = allText + '\n' + '###### '
-    }
-    if(paragraphHeading === DocumentApp.ParagraphHeading.HEADING6){
-      allText = allText + '\n' + '###### '
-    }
-    if(paragraphHeading === DocumentApp.ParagraphHeading.NORMAL){
-      allText = allText + '\n';
-    }
-    
-    // transform inline text as markdown
-    var paragraphTextMarkdown = '';
-      
-    var grandChildrenNumber = child.getNumChildren();
-    
-    if(grandChildrenNumber >= 1){
-      var textObject = child.getChild(0)
-      paragraphTextMarkdown = gDocTextToMarkdown(textObject);  
-    }
-    
-    allText += paragraphTextMarkdown;
-  } 
-  
-  return allText;
-}
